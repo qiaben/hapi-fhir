@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: hapi-fhir
-        image: hapiproject/hapi:latest
+        image: hapiproject/hapi:v8.6.0-1
         ports:
         - name: http
           containerPort: 8080

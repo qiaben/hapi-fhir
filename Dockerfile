@@ -1,4 +1,4 @@
-FROM hapiproject/hapi:latest
+FROM hapiproject/hapi:v8.6.0-1
 
 # Set environment variables
 ENV SPRING_CONFIG_LOCATION=file:///app/config/application.yaml
