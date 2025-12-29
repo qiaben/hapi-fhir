@@ -1,0 +1,75 @@
+name: Build & Deploy HAPI FHIR Dev
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+env:
+  REGISTRY: registry.apps-dev.in.hinisoft.com
+  IMAGE_NAME: hapi-fhir
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Generate version tag
+      id: version
+      run: |
+        VERSION="v1.0.$(date +%Y%m%d%H%M%S)"
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Generated version: $VERSION"
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.VERSION }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+    - name: Create database if not exists
+      run: |
+        kubectl exec -n default deploy/postgres-dev -- psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'hapi_fhir_db'" | grep -q 1 || \
+        kubectl exec -n default deploy/postgres-dev -- psql -U postgres -c "CREATE DATABASE hapi_fhir_db"
+      continue-on-error: true
+
+    - name: Create secret if not exists
+      run: |
+        kubectl get secret dev-hapi-fhir-secret -n default || \
+        kubectl create secret generic dev-hapi-fhir-secret -n default \
+          --from-literal=DB_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+      continue-on-error: true
+
+    - name: Update image tag in deployment
+      run: |
+        cd k8s/overlays/dev
+        sed -i "s|image: hapiproject/hapi:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.VERSION }}|g" deployment-patch.yaml
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -k k8s/overlays/dev
+        kubectl rollout status deployment/dev-hapi-fhir -n default --timeout=300s
+
+    - name: Verify deployment
+      run: |
+        kubectl get pods -n default -l app=hapi-fhir
+        kubectl get svc -n default -l app=hapi-fhir
+        kubectl get ingress -n default -l app=hapi-fhir

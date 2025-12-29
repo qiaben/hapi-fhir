@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hapi-fhir
+spec:
+  template:
+    spec:
+      containers:
+      - name: hapi-fhir
+        image: hapiproject/hapi:latest
+        env:
+        - name: SERVER_ADDRESS
+          value: "https://fhir.apps-dev.in.hinisoft.com/fhir"
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres-dev.default.svc.cluster.local:5432/hapi_fhir_db"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dev-hapi-fhir-secret
+              key: DB_PASSWORD
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"

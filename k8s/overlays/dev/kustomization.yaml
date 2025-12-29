@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default
+
+resources:
+- ../../base
+
+namePrefix: dev-
+
+labels:
+- pairs:
+    environment: dev
+
+patches:
+- path: deployment-patch.yaml
+- path: secret-patch.yaml
+- patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: fhir.apps-dev.in.hinisoft.com
+    - op: replace
+      path: /spec/tls/0/hosts/0
+      value: fhir.apps-dev.in.hinisoft.com
+    - op: replace
+      path: /spec/tls/0/secretName
+      value: dev-fhir-tls
+  target:
+    kind: Ingress
+    name: hapi-fhir-ingress

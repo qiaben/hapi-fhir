@@ -1,0 +1,66 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-dev.default.svc.cluster.local:5432/hapi_fhir_db
+    username: postgres
+    password: ${DB_PASSWORD}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect
+        search:
+          enabled: false
+        format_sql: false
+        show_sql: false
+        hbm2ddl:
+          auto: update
+        jdbc:
+          batch_size: 20
+        cache:
+          use_query_cache: false
+          use_second_level_cache: false
+          use_structured_entries: false
+          use_minimal_puts: false
+
+hapi:
+  fhir:
+    version: R4
+    server_address: ${SERVER_ADDRESS:http://localhost:8080/fhir}
+    defer_indexing_for_codesystems_of_size: 101
+    fhir_version: R4
+    allow_external_references: true
+    allow_multiple_delete: true
+    allow_placeholder_references: true
+    auto_create_placeholder_reference_targets: true
+    default_encoding: JSON
+    default_pretty_print: true
+    delete_expunge_enabled: true
+    enable_index_missing_fields: false
+    enable_repository_validating_interceptor: false
+    enforce_referential_integrity_on_delete: false
+    enforce_referential_integrity_on_write: false
+    etag_support_enabled: true
+    expunge_enabled: true
+    language_search_parameter_enabled: true
+    narrative_enabled: false
+    reuse_cached_search_results_millis: 60000
+    retain_cached_searches_mins: 60
+    tester:
+      home:
+        name: HAPI FHIR Server
+        server_address: ${SERVER_ADDRESS:http://localhost:8080/fhir}
+        fhir_version: R4
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    ca.uhn.fhir: INFO
