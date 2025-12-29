@@ -36,6 +36,12 @@ spec:
           value: "true"
         - name: HAPI_FHIR_DELETE_EXPUNGE_ENABLED
           value: "true"
+        - name: HAPI_FHIR_SECURITY_ENABLED
+          value: "true"
+        - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+          value: "https://aran.apps-dev.in.hinisoft.com/realms/master"
+        - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+          value: "https://aran.apps-dev.in.hinisoft.com/realms/master/protocol/openid-connect/certs"
         resources:
           requests:
             memory: "1Gi"

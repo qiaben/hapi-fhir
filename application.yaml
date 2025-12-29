@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:https://aran.apps-dev.in.hinisoft.com/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:https://aran.apps-dev.in.hinisoft.com/realms/master/protocol/openid-connect/certs}
   datasource:
     url: jdbc:postgresql://postgres-dev.default.svc.cluster.local:5432/hapi_fhir_db
     username: postgres
