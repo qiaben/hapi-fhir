@@ -26,8 +26,8 @@ spec:
             secretKeyRef:
               name: hapi-fhir-secret
               key: DB_PASSWORD
-        - name: SERVER_ADDRESS
-          value: "https://hapi-fhir.apps-dev.in.hinisoft.com/fhir"
+        - name: HAPI_FHIR_SERVER_ADDRESS
+          value: "https://fhir.apps-dev.in.hinisoft.com/fhir"
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://postgres:5432/hapi_fhir_db"
         - name: SPRING_DATASOURCE_USERNAME

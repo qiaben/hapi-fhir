@@ -9,7 +9,7 @@ spec:
       - name: hapi-fhir
         image: hapiproject/hapi:v8.6.0-1
         env:
-        - name: SERVER_ADDRESS
+        - name: HAPI_FHIR_SERVER_ADDRESS
           value: "https://fhir.apps-dev.in.hinisoft.com/fhir"
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://postgres-dev.default.svc.cluster.local:5432/hapi_fhir_db"
@@ -20,6 +20,22 @@ spec:
             secretKeyRef:
               name: dev-hapi-fhir-secret
               key: DB_PASSWORD
+        - name: SPRING_DATASOURCE_DRIVERCLASSNAME
+          value: "org.postgresql.Driver"
+        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+          value: "ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgresDialect"
+        - name: HAPI_FHIR_PARTITIONING_ENABLED
+          value: "true"
+        - name: HAPI_FHIR_PARTITIONING_ALLOW_REFERENCES_ACROSS_PARTITIONS
+          value: "false"
+        - name: HAPI_FHIR_ALLOW_EXTERNAL_REFERENCES
+          value: "true"
+        - name: HAPI_FHIR_ALLOW_MULTIPLE_DELETE
+          value: "true"
+        - name: HAPI_FHIR_EXPUNGE_ENABLED
+          value: "true"
+        - name: HAPI_FHIR_DELETE_EXPUNGE_ENABLED
+          value: "true"
         resources:
           requests:
             memory: "1Gi"

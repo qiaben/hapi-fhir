@@ -25,9 +25,13 @@ spring:
 hapi:
   fhir:
     version: R4
-    server_address: ${SERVER_ADDRESS:http://localhost:8080/fhir}
+    server_address: ${HAPI_FHIR_SERVER_ADDRESS:http://localhost:8080/fhir}
     defer_indexing_for_codesystems_of_size: 101
     fhir_version: R4
+    partitioning:
+      enabled: true
+      allow_references_across_partitions: false
+      partitioning_include_in_search_hashes: true
     allow_external_references: true
     allow_multiple_delete: true
     allow_placeholder_references: true
@@ -48,7 +52,7 @@ hapi:
     tester:
       home:
         name: HAPI FHIR Server
-        server_address: ${SERVER_ADDRESS:http://localhost:8080/fhir}
+        server_address: ${HAPI_FHIR_SERVER_ADDRESS:http://localhost:8080/fhir}
         fhir_version: R4
 
 management:
